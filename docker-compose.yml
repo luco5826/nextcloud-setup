@@ -1,0 +1,33 @@
+version: "3"
+services:
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ${PWD}/postgresdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=YOUR_PASSWORD
+    restart: always
+  nextcloud:
+    image: nextcloud
+    ports:
+      - 100:80
+      - 1080:1080
+    volumes:
+      - ${PWD}/nextcloud:/var/www/html/
+    restart: always
+    depends_on: 
+      - postgres
+  apache:
+    image: httpd 
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ${PWD}/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ${PWD}/apache/extra/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf
+      - ${PWD}/apache/certs/:/usr/local/apache2/certs/
+    restart: always
+    depends_on: 
+      - nextcloud
